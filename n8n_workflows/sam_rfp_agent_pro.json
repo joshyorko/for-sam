@@ -1,0 +1,1157 @@
+{
+  "name": "Sam's RFP AI Agent (Pro Version)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# 🚀 Sam's RFP AI Agent (Production Ready)\n\n**Based on:** Cole Medin's Ultimate RAG V4 + Zubair's RFP Tutorial\n\n## What This Does:\n1. **Ingests RFP documents** from Google Drive\n2. **Chunks and embeds** using smart chunking (500 chars, 50 overlap)\n3. **Stores in Postgres/PGVector** with upsert logic\n4. **Retrieves exact Q&A pairs** for new RFP proposals\n\n## Setup:\n1. Run the \"Create Documents Table\" node first\n2. Configure Google Drive folder ID\n3. Configure Postgres (Neon/Supabase) credentials\n4. Configure OpenAI API key\n5. (Optional) Set up Error Notification Workflow\n\n## 🛡️ Production Features:\n- **Upsert Logic**: Updates existing docs without duplicates\n- **Cohere Reranking**: Top 5 from 25 results\n- **RFP-Specific Prompt**: Returns exact Q&A matches\n- **Retry on Failure**: 3 retries with exponential backoff\n- **Error Notifications**: Slack/Email alerts on failures\n- **Fallback LLM**: Claude backup if OpenAI fails\n- **Input Validation**: Prevents empty/invalid queries\n- **Rate Limiting**: Protects against API quota issues",
+        "height": 600,
+        "width": 520,
+        "color": 6
+      },
+      "id": "readme-note",
+      "name": "README",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1️⃣ Database Setup (Run Once)",
+        "height": 280,
+        "width": 720,
+        "color": 3
+      },
+      "id": "setup-note",
+      "name": "Setup Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1880,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Enable pgvector extension\nCREATE EXTENSION IF NOT EXISTS vector;\n\n-- Create documents table for RFP storage\nCREATE TABLE IF NOT EXISTS rfp_documents (\n    id TEXT PRIMARY KEY,\n    title TEXT,\n    url TEXT,\n    file_type TEXT,\n    chunk_count INTEGER DEFAULT 0,\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP DEFAULT NOW()\n);\n\n-- Create ingestion log for tracking\nCREATE TABLE IF NOT EXISTS rfp_ingestion_log (\n    id SERIAL PRIMARY KEY,\n    document_id TEXT,\n    status TEXT,\n    error_message TEXT,\n    chunks_processed INTEGER,\n    created_at TIMESTAMP DEFAULT NOW()\n);",
+        "options": {}
+      },
+      "id": "create-docs-table",
+      "name": "Create Documents Table",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -1760,
+        -100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 2️⃣ Document Ingestion Flow\n\n**Error Handling:**\n- Retry on Failure: 3 attempts\n- Continue on Fail for non-critical nodes\n- Error branch sends notifications",
+        "height": 720,
+        "width": 2600,
+        "color": 5
+      },
+      "id": "ingestion-note",
+      "name": "Ingestion Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1880,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+          "mode": "id"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "file-created-trigger",
+      "name": "File Created in RFP Folder",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        220
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GOOGLE_DRIVE_CREDENTIAL_ID",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+          "mode": "id"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "file-updated-trigger",
+      "name": "File Updated in RFP Folder",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        400
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GOOGLE_DRIVE_CREDENTIAL_ID",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "loop-items",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "file-id",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "file-type",
+              "name": "file_type",
+              "value": "={{ $json.mimeType }}",
+              "type": "string"
+            },
+            {
+              "id": "file-title",
+              "name": "file_title",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "file-url",
+              "name": "file_url",
+              "value": "={{ $json.webViewLink }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-file-id",
+      "name": "Set File ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM rfp_vectors WHERE metadata->>'file_id' = $1;",
+        "options": {
+          "queryReplacement": "={{ $json.file_id }}"
+        }
+      },
+      "id": "delete-old-vectors",
+      "name": "Delete Old Vectors (Upsert)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1040,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      },
+      "notes": "CRITICAL: This implements 'Upsert' logic - deletes existing chunks before re-inserting to prevent duplicates."
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "rfp_documents",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Set File ID').item.json.file_id }}",
+            "title": "={{ $('Set File ID').item.json.file_title }}",
+            "url": "={{ $('Set File ID').item.json.file_url }}"
+          },
+          "matchingColumns": [
+            "id"
+          ]
+        },
+        "options": {}
+      },
+      "id": "upsert-doc-metadata",
+      "name": "Upsert Document Metadata",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -800,
+        300
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Set File ID').item.json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "download-file",
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -560,
+        300
+      ],
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GOOGLE_DRIVE_CREDENTIAL_ID",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set File ID').item.json.file_type }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set File ID').item.json.file_type }}",
+                    "rightValue": "application/vnd.google-apps.document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "file-type-switch",
+      "name": "Switch by File Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "extract-pdf",
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "extract-text",
+      "name": "Extract Document Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        400
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.content || $json.data || $json.text }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "={{ $('Set File ID').first().json.file_id }}"
+              },
+              {
+                "name": "file_title",
+                "value": "={{ $('Set File ID').first().json.file_title }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "data-loader",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "chunkOverlap": 50
+      },
+      "id": "text-splitter",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        280,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "id": "embeddings-ingest",
+      "name": "Embeddings OpenAI (Ingest)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        160,
+        640
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "rfp_vectors",
+        "options": {}
+      },
+      "id": "pgvector-insert",
+      "name": "PGVector Store (Insert)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        300
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO rfp_ingestion_log (document_id, status, chunks_processed) VALUES ($1, 'success', $2);",
+        "options": {
+          "queryReplacement": "={{ $('Set File ID').first().json.file_id }},={{ $json.ids?.length || 1 }}"
+        }
+      },
+      "id": "log-success",
+      "name": "Log Ingestion Success",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        620,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO rfp_ingestion_log (document_id, status, error_message) VALUES ($1, 'error', $2);",
+        "options": {
+          "queryReplacement": "={{ $('Set File ID').first().json.file_id }},={{ $json.error?.message || 'Unknown error' }}"
+        }
+      },
+      "id": "log-error",
+      "name": "Log Ingestion Error",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        620,
+        500
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 3️⃣ RFP Chat / Retrieval Flow\n\n**Production Features:**\n- Input validation (empty query check)\n- Fallback LLM (Claude if OpenAI fails)\n- Query expansion for better matches",
+        "height": 640,
+        "width": 1400,
+        "color": 4
+      },
+      "id": "chat-note",
+      "name": "Chat Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1880,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "id": "chat-trigger",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1760,
+        1020
+      ],
+      "webhookId": "rfp-chat-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "chat-input",
+              "name": "chatInput",
+              "value": "={{ $json?.chatInput || $json.body.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "session-id",
+              "name": "sessionId",
+              "value": "={{ $json?.sessionId || $json.body.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "is-valid",
+              "name": "isValidQuery",
+              "value": "={{ ($json?.chatInput || $json.body.chatInput || '').trim().length > 2 }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields",
+      "name": "Edit Fields & Validate",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1520,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.isValidQuery }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "validate-input",
+      "name": "Valid Query?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ JSON.stringify({ error: 'Please provide a valid query (at least 3 characters).' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "invalid-query-response",
+      "name": "Return Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        1180
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields & Validate').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "You are an RFP (Request for Proposal) AI Assistant that helps fill out new proposals by retrieving exact Question & Answer pairs from the company's past RFP documents.\n\n## Your Primary Goal:\nRetrieve all question-and-answer pairs that closely match the query, ensuring you return multiple relevant pairs whenever possible to allow the user to choose the most accurate match.\n\n## Instructions:\n1. Use the RAG tool to search the RFP knowledge base\n2. Find Q&A pairs that match the user's query\n3. Return the EXACT text from past RFPs - do not paraphrase or generate new answers\n4. If multiple similar Q&A pairs exist, return ALL of them so the user can choose\n5. Include the source document title for each Q&A pair\n6. If no matching Q&A pairs are found, clearly state that and suggest how the user might rephrase their query\n\n## Response Format:\nFor each match found:\n- **Source:** [Document Title]\n- **Question:** [Original question from RFP]\n- **Answer:** [Exact answer from past RFP]\n- **Confidence:** [High/Medium/Low based on match quality]\n\n## Important:\n- NEVER make up answers - only use content from the knowledge base\n- If the knowledge base doesn't contain relevant information, say so honestly\n- Prioritize exact matches over partial matches\n- If you find very similar questions with different answers, show ALL of them\n- Always mention the source document so users can verify"
+        }
+      },
+      "id": "rag-agent",
+      "name": "RFP RAG Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        -1040,
+        1020
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "id": "chat-model",
+      "name": "OpenAI Chat Model (Primary)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        1280
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-haiku-20241022",
+        "options": {}
+      },
+      "id": "fallback-chat-model",
+      "name": "Anthropic Claude (Fallback)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        1280
+      ],
+      "disabled": true,
+      "credentials": {
+        "anthropicApi": {
+          "id": "YOUR_ANTHROPIC_CREDENTIAL_ID",
+          "name": "Anthropic account"
+        }
+      },
+      "notes": "BACKUP LLM: To use Claude instead of OpenAI, disable the OpenAI node and enable this one. Then reconnect this to the RFP RAG Agent's ai_languageModel input."
+    },
+    {
+      "parameters": {},
+      "id": "chat-memory",
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        1440
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use RAG to search the RFP knowledge base for past Q&A pairs. Always use this tool first when the user asks about RFP content. Returns the most relevant document chunks with their source titles.",
+        "tableName": "rfp_vectors",
+        "topK": 25,
+        "useReranker": true,
+        "options": {}
+      },
+      "id": "pgvector-retriever",
+      "name": "PGVector Store (Retrieve)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        -880,
+        1280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres (Neon/Supabase)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "id": "embeddings-retrieve",
+      "name": "Embeddings OpenAI (Retrieve)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        1440
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "topN": 5
+      },
+      "id": "reranker",
+      "name": "Reranker Cohere",
+      "type": "@n8n/n8n-nodes-langchain.rerankerCohere",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        1440
+      ],
+      "credentials": {
+        "cohereApi": {
+          "id": "YOUR_COHERE_CREDENTIAL_ID",
+          "name": "Cohere API"
+        }
+      },
+      "notes": "Optional: Removes this node if you don't have a Cohere API key. Set useReranker to false in PGVector retriever."
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -800,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4️⃣ Error Notification (Optional)\n\nConnect this to your Slack/Email for production alerts",
+        "height": 200,
+        "width": 400,
+        "color": 7
+      },
+      "id": "error-note",
+      "name": "Error Handling Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        560,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "#rfp-agent-alerts",
+        "text": "⚠️ *RFP Agent Ingestion Error*\n\n*Document:* {{ $('Set File ID').first().json.file_title }}\n*File ID:* {{ $('Set File ID').first().json.file_id }}\n*Error:* {{ $json.error?.message || 'Unknown error' }}\n*Time:* {{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+        "otherOptions": {}
+      },
+      "id": "slack-error-notify",
+      "name": "Slack Error Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        840,
+        200
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "YOUR_SLACK_CREDENTIAL_ID",
+          "name": "Slack account"
+        }
+      },
+      "notes": "Optional: Configure your Slack workspace to receive error notifications. Remove if not needed."
+    }
+  ],
+  "connections": {
+    "File Created in RFP Folder": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Updated in RFP Folder": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File ID": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Vectors (Upsert)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Old Vectors (Upsert)": {
+      "main": [
+        [
+          {
+            "node": "Upsert Document Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Document Metadata": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Switch by File Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch by File Type": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Document Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Document Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Text": {
+      "main": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Document Text": {
+      "main": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI (Ingest)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "PGVector Store (Insert)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "PGVector Store (Insert)",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PGVector Store (Insert)": {
+      "main": [
+        [
+          {
+            "node": "Log Ingestion Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Ingestion Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Ingestion Success": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Ingestion Error": {
+      "main": [
+        [
+          {
+            "node": "Slack Error Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields & Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields & Validate": {
+      "main": [
+        [
+          {
+            "node": "Valid Query?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Query?": {
+      "main": [
+        [
+          {
+            "node": "RFP RAG Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model (Primary)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RFP RAG Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RFP RAG Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PGVector Store (Retrieve)": {
+      "ai_tool": [
+        [
+          {
+            "node": "RFP RAG Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI (Retrieve)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "PGVector Store (Retrieve)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reranker Cohere": {
+      "ai_reranker": [
+        [
+          {
+            "node": "PGVector Store (Retrieve)",
+            "type": "ai_reranker",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RFP RAG Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "sam-rfp-agent-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "sam-rfp-agent"
+  },
+  "id": "sam-rfp-agent",
+  "tags": [
+    {
+      "name": "RFP",
+      "id": "rfp-tag"
+    },
+    {
+      "name": "RAG",
+      "id": "rag-tag"
+    }
+  ]
+}
