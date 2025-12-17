@@ -5,11 +5,91 @@
 | File | Description |
 |------|-------------|
 | `cole_ultimate_rag_v4.json` | **Original** Cole Medin's Ultimate RAG Agent V4 (full version with all features) |
-| `sam_rfp_agent_pro.json` | **Custom** RFP Agent for Sam - simplified & focused on RFP Q&A retrieval |
+| `sam_rfp_agent_pro.json` | **Custom** RFP Agent for Sam - PGVector version (more control, self-hosted) |
+| `sam_rfp_agent_supabase.json` | **NEW! Supabase** RFP Agent - Easiest to set up! Uses Supabase's built-in vector store |
+| `supabase_setup.sql` | SQL script to set up Supabase tables (run this first!) |
 
 ---
 
-## 🚀 Quick Start: Sam's RFP Agent
+## 🎯 Which Version Should I Use?
+
+| If you want... | Use this |
+|---------------|----------|
+| **Easiest setup** (recommended for beginners) | `sam_rfp_agent_supabase.json` |
+| **More control** & self-hosted Postgres | `sam_rfp_agent_pro.json` |
+| **All features** from Cole's original | `cole_ultimate_rag_v4.json` |
+
+---
+
+## 🚀 OPTION A: Supabase Version (Recommended - Easiest!)
+
+### Why Supabase?
+- ✅ **No self-hosted database** - Supabase handles everything
+- ✅ **Free tier** - 500MB database, generous limits
+- ✅ **Built-in pgvector** - No extension setup needed
+- ✅ **n8n has native Supabase nodes** - Drop-in integration
+- ✅ **Dashboard** - See your data in a nice UI
+
+### Step 1: Create Supabase Project
+
+1. Go to [supabase.com](https://supabase.com) and create account
+2. Click **New Project** 
+3. Name it `sam-rfp-agent` (or whatever you want)
+4. Copy your credentials:
+   - **Project URL** (looks like `https://xxxx.supabase.co`)
+   - **Service Role Key** (under Settings > API)
+
+### Step 2: Run the SQL Setup
+
+1. In Supabase, go to **SQL Editor**
+2. Open `/workspaces/for-sam/n8n_workflows/supabase_setup.sql`
+3. Copy the entire contents and paste into the SQL Editor
+4. Click **Run** 
+5. You should see tables created: `rfp_documents`, `rfp_ingestion_log`
+
+### Step 3: Import Workflow
+
+1. Open your n8n instance
+2. Go to **Workflows** > **Import from File**
+3. Select `sam_rfp_agent_supabase.json`
+
+### Step 4: Configure Credentials
+
+Create these credentials in n8n:
+
+| Credential | Where to find |
+|------------|---------------|
+| **Supabase API** | Project URL + Service Role Key |
+| **OpenAI API** | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| **Google Drive OAuth2** | n8n will guide you through OAuth |
+
+Then update these nodes (search for `YOUR_` in the workflow):
+- All **Supabase** nodes
+- All **OpenAI** nodes
+- All **Google Drive** nodes
+
+### Step 5: Configure Google Drive
+
+1. Create a folder in Google Drive for RFP documents
+2. Get folder ID from URL: `https://drive.google.com/drive/folders/YOUR_FOLDER_ID`
+3. Update the trigger nodes with your folder ID
+
+### Step 6: Test It!
+
+1. Upload a sample RFP document to your Google Drive folder
+2. Watch the workflow execute
+3. Check Supabase Table Editor - you should see rows in `rfp_documents`
+4. Try the chat endpoint with a question!
+
+---
+
+## 🚀 OPTION B: PGVector Version (More Control)
+
+Use `sam_rfp_agent_pro.json` if you want:
+- Self-hosted Postgres (Neon, Railway, etc.)
+- More customization options
+- Cohere reranking for better accuracy
+- Fallback LLM support
 
 ### 1. Prerequisites
 
@@ -93,19 +173,20 @@ The agent is configured to:
 
 ---
 
-## 📊 Comparison: Cole's V4 vs Sam's RFP Agent
+## 📊 Comparison: All Three Versions
 
-| Feature | Cole's V4 | Sam's RFP Agent |
-|---------|-----------|-----------------|
-| Vector Store | Postgres/PGVector | Postgres/PGVector |
-| Document Types | PDF, DOCX, TXT, CSV, Excel | PDF, DOCX, TXT |
-| SQL Query Tool | ✅ Yes (for tabular data) | ❌ Removed (not needed for RFPs) |
-| File Content Tool | ✅ Yes | ❌ Removed |
-| Reranking | ✅ Cohere | ✅ Cohere |
-| Agentic Chunking | ✅ LLM-based | ❌ Recursive Character (simpler) |
-| Trash Cleanup | ✅ Auto-deletes trashed files | ❌ Not included |
-| System Prompt | General RAG | **RFP-specific Q&A retrieval** |
-| Complexity | High (50+ nodes) | Medium (25 nodes) |
+| Feature | Supabase Version | PGVector Version | Cole's V4 |
+|---------|-----------------|------------------|-----------|
+| **Setup Difficulty** | 🟢 Easy | 🟡 Medium | 🔴 Complex |
+| **Database** | Supabase (hosted) | Self-hosted Postgres | Self-hosted Postgres |
+| **Vector Store** | Supabase Vector Store node | PGVector node | PGVector node |
+| **Embeddings** | OpenAI text-embedding-3-small | OpenAI text-embedding-3-small | OpenAI |
+| **Reranking** | ❌ Not included | ✅ Cohere | ✅ Cohere |
+| **SQL Query Tool** | ❌ | ❌ | ✅ |
+| **Fallback LLM** | ❌ | ✅ Anthropic Claude | ❌ |
+| **Error Logging** | ✅ Supabase table | ✅ Postgres table | ❌ |
+| **Node Count** | ~25 | ~35 | ~50+ |
+| **Best For** | Quick setup, beginners | Production, customization | Full-featured RAG |
 
 ---
 

@@ -1,0 +1,928 @@
+{
+  "name": "Sam's RFP Agent (Supabase)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# 🚀 Sam's RFP AI Agent (Supabase Edition)\n## Based on Cole Medin's Ultimate RAG Pattern\n\n**Features:**\n- ✅ Supabase Vector Store (no Postgres setup needed!)\n- ✅ OpenAI text-embedding-3-small (1536 dims)\n- ✅ Google Drive integration\n- ✅ Upsert logic (updates existing Q&As)\n- ✅ Production-ready error handling\n\n**Setup:**\n1. Run supabase_setup.sql in Supabase SQL Editor\n2. Configure Supabase + OpenAI credentials\n3. Connect Google Drive folder\n4. Test it out!\n\n**Author:** Built for Sam 💪",
+        "height": 520,
+        "width": 420,
+        "color": 5
+      },
+      "id": "sticky-note-main",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-240, 60]
+    },
+    {
+      "parameters": {
+        "content": "## 📥 DOCUMENT INGESTION FLOW\nWatches Google Drive → Extracts Q&As → Embeds → Stores in Supabase",
+        "height": 280,
+        "width": 1900,
+        "color": 4
+      },
+      "id": "sticky-ingestion",
+      "name": "Ingestion Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 120]
+    },
+    {
+      "parameters": {
+        "content": "## 💬 CHAT/QUERY FLOW\nReceives question → Vector search → LLM generates answer with citations",
+        "height": 320,
+        "width": 1700,
+        "color": 6
+      },
+      "id": "sticky-chat",
+      "name": "Chat Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 720]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+          "mode": "id"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "gdrive-trigger",
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [240, 200],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GDRIVE_CRED_ID",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "gdrive-download",
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [460, 200],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GDRIVE_CRED_ID",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "extract-text",
+      "name": "Extract Document Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "file-id",
+              "name": "file_id",
+              "value": "={{ $('Google Drive Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "file-name",
+              "name": "file_name",
+              "value": "={{ $('Google Drive Trigger').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "raw-text",
+              "name": "raw_text",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-file-info",
+      "name": "Set File Info",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "llm-qa-extractor",
+      "name": "OpenAI Chat Model (Extractor)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [1160, 360],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CRED_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an RFP document parser. Extract ALL question-answer pairs from this RFP document.\n\nDocument:\n{{ $json.raw_text }}\n\nRules:\n1. Extract EVERY Q&A pair you can find\n2. Preserve the exact wording of questions and answers\n3. If a question has no clear answer, use \"No answer provided\"\n4. Return as a JSON array\n\nReturn ONLY valid JSON in this format:\n[\n  {\n    \"question\": \"What is your company's experience with X?\",\n    \"answer\": \"We have 10 years of experience...\"\n  }\n]\n\nExtracted Q&A pairs:"
+      },
+      "id": "chain-qa-extractor",
+      "name": "Extract Q&A Pairs",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the LLM output to extract Q&A pairs\nconst fileId = $('Set File Info').first().json.file_id;\nconst fileName = $('Set File Info').first().json.file_name;\nconst llmOutput = $input.first().json.text;\n\ntry {\n  // Try to parse as JSON directly\n  let qaPairs;\n  \n  // Find JSON array in the output\n  const jsonMatch = llmOutput.match(/\\[\\s*\\{[\\s\\S]*\\}\\s*\\]/);\n  if (jsonMatch) {\n    qaPairs = JSON.parse(jsonMatch[0]);\n  } else {\n    qaPairs = JSON.parse(llmOutput);\n  }\n  \n  // Map to output items with metadata\n  return qaPairs.map((qa, index) => ({\n    json: {\n      file_id: fileId,\n      file_name: fileName,\n      question: qa.question || qa.q,\n      answer: qa.answer || qa.a,\n      content: `Question: ${qa.question || qa.q}\\n\\nAnswer: ${qa.answer || qa.a}`,\n      metadata: {\n        source_file: fileName,\n        file_id: fileId,\n        qa_index: index,\n        extracted_at: new Date().toISOString()\n      }\n    }\n  }));\n} catch (error) {\n  // If parsing fails, return error info\n  return [{\n    json: {\n      file_id: fileId,\n      file_name: fileName,\n      error: true,\n      error_message: `Failed to parse Q&A: ${error.message}`,\n      raw_output: llmOutput\n    }\n  }];\n}"
+      },
+      "id": "parse-qa-pairs",
+      "name": "Parse Q&A JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-error",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-valid-qa",
+      "name": "Check for Errors",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "id": "embeddings-openai-ingest",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [1860, 360],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CRED_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "rfp_documents",
+          "mode": "list"
+        },
+        "options": {
+          "queryName": "match_rfp_documents"
+        }
+      },
+      "id": "supabase-vector-store-insert",
+      "name": "Supabase Vector Store (Insert)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [1780, 200],
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CRED_ID",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 2000,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "doc-default-loader",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [1860, 420]
+    },
+    {
+      "parameters": {
+        "chunkSize": 2000,
+        "chunkOverlap": 200
+      },
+      "id": "text-splitter",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [1860, 480]
+    },
+    {
+      "parameters": {
+        "tableId": "rfp_ingestion_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "file_id",
+              "fieldValue": "={{ $('Set File Info').first().json.file_id }}"
+            },
+            {
+              "fieldId": "file_name",
+              "fieldValue": "={{ $('Set File Info').first().json.file_name }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "success"
+            },
+            {
+              "fieldId": "chunks_processed",
+              "fieldValue": "={{ $input.all().length }}"
+            }
+          ]
+        }
+      },
+      "id": "log-success",
+      "name": "Log Success",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2020, 200],
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CRED_ID",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rfp-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-chat",
+      "name": "Chat Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 800],
+      "webhookId": "rfp-chat-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "query",
+              "name": "query",
+              "value": "={{ $json.body.query || $json.body.question || $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "session-id",
+              "name": "session_id",
+              "value": "={{ $json.body.session_id || 'default' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-query-fields",
+      "name": "Set Query Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 800]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-query",
+              "leftValue": "={{ $json.query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "validate-query",
+      "name": "Validate Query",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 800]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "id": "embeddings-openai-search",
+      "name": "OpenAI Embeddings (Search)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [980, 960],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CRED_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "tableName": {
+          "__rl": true,
+          "value": "rfp_documents",
+          "mode": "list"
+        },
+        "prompt": "={{ $('Set Query Fields').item.json.query }}",
+        "topK": 5,
+        "options": {
+          "queryName": "match_rfp_documents"
+        }
+      },
+      "id": "supabase-vector-search",
+      "name": "Supabase Vector Store (Search)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [900, 800],
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CRED_ID",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format retrieved documents for the LLM context\nconst query = $('Set Query Fields').first().json.query;\nconst docs = $input.all();\n\nif (!docs || docs.length === 0) {\n  return [{\n    json: {\n      query: query,\n      context: \"No relevant documents found in the knowledge base.\",\n      sources: [],\n      has_context: false\n    }\n  }];\n}\n\n// Build context from retrieved documents\nlet context = \"\";\nconst sources = [];\n\nfor (let i = 0; i < docs.length; i++) {\n  const doc = docs[i].json.document || docs[i].json;\n  const pageContent = doc.pageContent || doc.content || '';\n  const metadata = doc.metadata || {};\n  \n  context += `\\n--- Source ${i + 1} (${metadata.source_file || 'Unknown'}) ---\\n`;\n  context += pageContent;\n  context += \"\\n\";\n  \n  sources.push({\n    index: i + 1,\n    file_name: metadata.source_file || 'Unknown',\n    file_id: metadata.file_id || '',\n    similarity: doc.similarity || 0\n  });\n}\n\nreturn [{\n  json: {\n    query: query,\n    context: context.trim(),\n    sources: sources,\n    has_context: true\n  }\n}];"
+      },
+      "id": "format-context",
+      "name": "Format Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 800]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "llm-chat-model",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [1380, 960],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CRED_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Sam's RFP Assistant - an expert at answering RFP (Request for Proposal) questions using past RFP responses.\n\n## CONTEXT FROM PREVIOUS RFPs:\n{{ $json.context }}\n\n## USER'S QUESTION:\n{{ $json.query }}\n\n## YOUR TASK:\n1. Find the EXACT answer from the context above\n2. Quote the answer directly when possible\n3. Cite which source document the answer came from\n4. If information is partial, combine from multiple sources\n5. Rate your confidence: HIGH (exact match), MEDIUM (close match), LOW (partial/inferred)\n\n## RESPONSE FORMAT:\n**Answer:** [Your answer here]\n\n**Source(s):** [Document name(s)]\n\n**Confidence:** [HIGH/MEDIUM/LOW]\n\n**Notes:** [Any caveats or suggestions for improving the answer]\n\n---\nIf no relevant information is found, say: \"I couldn't find a direct answer to this question in our RFP knowledge base. Consider drafting a new response.\""
+      },
+      "id": "chain-answer",
+      "name": "Generate Answer",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1340, 800]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "sources",
+              "name": "sources",
+              "value": "={{ $('Format Context').first().json.sources }}",
+              "type": "object"
+            },
+            {
+              "id": "query",
+              "name": "query",
+              "value": "={{ $('Set Query Fields').first().json.query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1560, 800]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  \"success\": true,\n  \"query\": $json.query,\n  \"response\": $json.response,\n  \"sources\": $json.sources,\n  \"timestamp\": new Date().toISOString()\n} }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond (Success)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1780, 800]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  \"success\": false,\n  \"error\": \"Missing query parameter. Send {\\\"query\\\": \\\"your question\\\"}\",\n  \"timestamp\": new Date().toISOString()\n} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Respond (Error)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 940]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ ERROR HANDLING\nLogs failures to Supabase for monitoring",
+        "height": 200,
+        "width": 340,
+        "color": 7
+      },
+      "id": "sticky-error",
+      "name": "Error Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2140, 120]
+    },
+    {
+      "parameters": {
+        "tableId": "rfp_ingestion_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "file_id",
+              "fieldValue": "={{ $('Set File Info').first().json.file_id }}"
+            },
+            {
+              "fieldId": "file_name",
+              "fieldValue": "={{ $('Set File Info').first().json.file_name }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "error"
+            },
+            {
+              "fieldId": "error_message",
+              "fieldValue": "={{ $json.error_message || 'Unknown error during ingestion' }}"
+            }
+          ]
+        }
+      },
+      "id": "log-error",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2240, 200],
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CRED_ID",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "schedule-reindex",
+      "name": "Scheduled Re-index",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 460]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "folderId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+          "mode": "id"
+        },
+        "returnAll": true,
+        "filter": {
+          "foldersOnly": false,
+          "trashed": false
+        },
+        "options": {}
+      },
+      "id": "list-drive-files",
+      "name": "List Drive Files",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [460, 460],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GDRIVE_CRED_ID",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## ⏰ SCHEDULED RE-INDEX\nRuns every 6 hours to catch any missed files",
+        "height": 180,
+        "width": 420,
+        "color": 3
+      },
+      "id": "sticky-schedule",
+      "name": "Schedule Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 420]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Extract Document Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Document Text": {
+      "main": [
+        [
+          {
+            "node": "Set File Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File Info": {
+      "main": [
+        [
+          {
+            "node": "Extract Q&A Pairs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model (Extractor)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Q&A Pairs",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Q&A Pairs": {
+      "main": [
+        [
+          {
+            "node": "Parse Q&A JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Q&A JSON": {
+      "main": [
+        [
+          {
+            "node": "Check for Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Errors": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store (Insert)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store (Insert)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store (Insert)",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store (Insert)": {
+      "main": [
+        [
+          {
+            "node": "Log Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Query Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Query Fields": {
+      "main": [
+        [
+          {
+            "node": "Validate Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Query": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store (Search)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond (Error)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings (Search)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store (Search)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store (Search)": {
+      "main": [
+        [
+          {
+            "node": "Format Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Context": {
+      "main": [
+        [
+          {
+            "node": "Generate Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Answer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Answer": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond (Success)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduled Re-index": {
+      "main": [
+        [
+          {
+            "node": "List Drive Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Drive Files": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "supabase-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "sam-rfp-supabase"
+  },
+  "id": "sam-rfp-supabase",
+  "tags": [
+    {
+      "id": "rfp",
+      "name": "RFP"
+    },
+    {
+      "id": "rag",
+      "name": "RAG"
+    },
+    {
+      "id": "supabase",
+      "name": "Supabase"
+    }
+  ]
+}
