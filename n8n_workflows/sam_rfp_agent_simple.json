@@ -7,13 +7,13 @@
         "width": 500,
         "color": 6
       },
-      "id": "932b37de-e0a2-42fb-bea6-773e3781ff88",
+      "id": "e91e8ff6-ed02-4ba4-a9fa-765b9b398723",
       "name": "README",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5344,
-        3808
+        0,
+        0
       ]
     },
     {
@@ -25,30 +25,30 @@
           "value": "vector_store_key"
         }
       },
-      "id": "a7c1d7b2-3d9e-4321-9cab-e11709483601",
+      "id": "3c6e661c-6783-4e39-855e-d06497c551fa",
       "name": "In-Memory Vector Store (Ingest)",
       "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
       "typeVersion": 1.3,
       "position": [
-        4624,
-        4864
+        -720,
+        1056
       ]
     },
     {
       "parameters": {
         "options": {}
       },
-      "id": "21c50559-a040-46a4-9625-53b79675dabf",
+      "id": "3aeb8d66-7c36-4959-b427-4c3350888381",
       "name": "Embeddings OpenAI",
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1.2,
       "position": [
-        4672,
-        5312
+        -672,
+        1504
       ],
       "credentials": {
         "openAiApi": {
-          "id": "oZ4DZA84PQMSagrq",
+          "id": "SJq89BKSPhNVrmgZ",
           "name": "OpenAi account"
         }
       }
@@ -56,15 +56,20 @@
     {
       "parameters": {
         "public": true,
-        "options": {}
+        "initialMessages": "Hi there Sam  !  This is your RFP creator",
+        "availableInChat": true,
+        "agentName": "RFP AGENT",
+        "options": {
+          "allowFileUploads": true
+        }
       },
-      "id": "074182d5-d464-42db-8b62-493995424e1f",
+      "id": "ec10c111-dd9b-4b8f-ba16-87430ca77133",
       "name": "Chat Entrypoint",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        5344,
-        4560
+        -176,
+        912
       ],
       "webhookId": "477555ef-512c-4e7b-963b-329da5f8051e"
     },
@@ -74,13 +79,13 @@
           "systemMessage": "You are Sam's RFP Assistant. Your job is to find exact answers from the documents Sam has uploaded.\n\n1. Always search the documents first using the vector store tool.\n2. Return the exact question and answer if you find a match.\n3. Be concise and helpful.\n4. Mention which document you found the answer in."
         }
       },
-      "id": "344e7c40-bc48-41b9-8682-b64ee6891170",
+      "id": "31ea8c98-66c6-43e6-b18c-16badcb092d1",
       "name": "AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        5568,
-        4560
+        224,
+        752
       ]
     },
     {
@@ -94,17 +99,17 @@
         "builtInTools": {},
         "options": {}
       },
-      "id": "1e631c4a-d3e1-4a21-af1d-bce059c7c3d1",
+      "id": "03bd9377-fbd7-4a4b-b7f1-7cde558961df",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        5568,
-        4768
+        224,
+        960
       ],
       "credentials": {
         "openAiApi": {
-          "id": "oZ4DZA84PQMSagrq",
+          "id": "SJq89BKSPhNVrmgZ",
           "name": "OpenAi account"
         }
       }
@@ -113,13 +118,13 @@
       "parameters": {
         "description": "Sam's RFP documents"
       },
-      "id": "a3aec283-cb4b-4fec-a5c6-7a41b54afb8b",
+      "id": "0756c1e9-fd23-4442-b94f-9a534220fd47",
       "name": "Vector Store Tool",
       "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
       "typeVersion": 1.1,
       "position": [
-        6032,
-        4704
+        688,
+        896
       ]
     },
     {
@@ -130,13 +135,13 @@
           "value": "vector_store_key"
         }
       },
-      "id": "3c6523d2-3329-45f8-a00e-59cd644914ff",
+      "id": "4b31d189-a302-4ea2-bf27-783de144fbf0",
       "name": "In-Memory Vector Store (Retrieve)",
       "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
       "typeVersion": 1.3,
       "position": [
-        5664,
-        5040
+        320,
+        1232
       ]
     },
     {
@@ -153,14 +158,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        6096,
-        4944
+        752,
+        1136
       ],
-      "id": "bd99c36d-089c-41fa-a09d-e4fd96943de0",
+      "id": "cd8018ed-f125-4e68-b7d9-5b63ff894c82",
       "name": "OpenAI Chat Model1",
       "credentials": {
         "openAiApi": {
-          "id": "oZ4DZA84PQMSagrq",
+          "id": "SJq89BKSPhNVrmgZ",
           "name": "OpenAi account"
         }
       }
@@ -174,10 +179,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        5056,
-        4480
+        -288,
+        672
       ],
-      "id": "ae2be244-79c0-43d1-872a-b0fed8a43d30",
+      "id": "828eca0a-f18b-4e7d-9408-a1a92c2c8542",
       "name": "Loop Over Items"
     },
     {
@@ -200,17 +205,17 @@
         "event": "fileCreated",
         "options": {}
       },
-      "id": "c81ea9f3-6054-4f94-8e49-1329d5dbd6de",
+      "id": "3151f4f7-4690-472a-b58c-8824bf591a68",
       "name": "File Created",
       "type": "n8n-nodes-base.googleDriveTrigger",
       "typeVersion": 1,
       "position": [
-        4592,
-        4016
+        -752,
+        208
       ],
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "g3pPtdGLe7lFujbM",
+          "id": "9A1iEHCBCn664Rvq",
           "name": "Google Drive account"
         }
       }
@@ -247,13 +252,13 @@
         },
         "options": {}
       },
-      "id": "2540173b-4074-4d71-b9b1-4422f8a70a25",
+      "id": "622917df-aefc-461a-af15-1f0776c0b878",
       "name": "Set File ID",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        6016,
-        4080
+        672,
+        272
       ]
     },
     {
@@ -272,18 +277,18 @@
           }
         }
       },
-      "id": "e9c79d43-40bc-442b-b260-2b685957eb76",
+      "id": "a9459d02-e1b8-437e-b455-d9e80baa816b",
       "name": "Download File",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        6448,
-        4080
+        1104,
+        272
       ],
       "executeOnce": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "g3pPtdGLe7lFujbM",
+          "id": "9A1iEHCBCn664Rvq",
           "name": "Google Drive account"
         }
       }
@@ -293,13 +298,13 @@
         "operation": "text",
         "options": {}
       },
-      "id": "4b0c8f18-d75e-4f1c-b10b-a282458b43d3",
+      "id": "315a84f3-1d25-483c-9f35-03eaed587ddd",
       "name": "Extract Document Text",
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        7568,
-        4384
+        2224,
+        576
       ],
       "alwaysOutputData": true
     },
@@ -308,13 +313,13 @@
         "operation": "pdf",
         "options": {}
       },
-      "id": "ad2020d4-d6e9-4266-9ce6-81f45e63ba66",
+      "id": "96b35c9d-44c1-4210-9d30-d2ba1cbe22da",
       "name": "Extract PDF Text",
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        7568,
-        4208
+        2224,
+        400
       ]
     },
     {
@@ -418,13 +423,13 @@
           "fallbackOutput": "extra"
         }
       },
-      "id": "988d1c9a-acb0-44db-a4f0-8e6520344b7b",
+      "id": "fca08698-f8f9-42ad-bdb6-6d3c2bdc26bb",
       "name": "Switch",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
       "position": [
-        6864,
-        4064
+        1520,
+        256
       ]
     },
     {
@@ -434,10 +439,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        7568,
-        3952
+        2224,
+        144
       ],
-      "id": "f348ed50-d28c-44ef-9ce9-d68fa59a71c1",
+      "id": "ce5539f4-5092-41a8-9921-aa6ae00e99c8",
       "name": "Extract from CSV"
     },
     {
@@ -447,10 +452,10 @@
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
       "position": [
-        4768,
-        5072
+        -576,
+        1264
       ],
-      "id": "79fd8a45-0642-4558-8205-a74f96ef6a13",
+      "id": "6139e5e8-f7fe-4cd9-89ad-6a5187da7204",
       "name": "Default Data Loader"
     },
     {
@@ -458,19 +463,46 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        5696,
-        4784
+        352,
+        976
       ],
-      "id": "caccbbbe-8170-486e-b502-5b763c3564b3",
+      "id": "24db0804-59bd-40d9-9c4b-0dbb497aea09",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "formTitle": "RFP DOCUMENTS Uploader",
+        "formDescription": "Upload your RFP Documents",
+        "formFields": {
+          "values": [
+            {
+              "fieldName": "Uplod",
+              "fieldLabel": "Upload Your Documents",
+              "fieldType": "file",
+              "requiredField": true
+            },
+            {
+              "fieldName": "RFP QUESTIONS",
+              "fieldLabel": "Please Upload Your Question From Excel",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.4,
+      "position": [
+        -16,
+        720
+      ],
+      "id": "9399d6db-8f66-429d-8319-ec204849140f",
+      "name": "On form submission",
+      "webhookId": "ac0cf775-8242-4edc-af70-69ee53999518"
     }
   ],
   "connections": {
-    "In-Memory Vector Store (Ingest)": {
-      "main": [
-        []
-      ]
-    },
     "Embeddings OpenAI": {
       "ai_embedding": [
         [
@@ -652,6 +684,11 @@
           }
         ]
       ]
+    },
+    "On form submission": {
+      "main": [
+        []
+      ]
     }
   },
   "pinData": {
@@ -678,6 +715,6 @@
   },
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "4c0ca4d0c6d7184d737a05b946b4bf5027b5effd45ff3194f7e25142a62a5977"
+    "instanceId": "ef9f9747bb3fe8394a760b6b2e598b61d7bdc6974de8ce420bc6b2cb60585cd6"
   }
 }
