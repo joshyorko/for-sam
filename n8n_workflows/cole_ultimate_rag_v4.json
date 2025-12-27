@@ -5,17 +5,17 @@
         "model": "gpt-4.1-mini",
         "options": {}
       },
-      "id": "9060e07c-4586-43a2-a743-7f7186c4411c",
+      "id": "7c98a986-4458-40a2-9ba8-42dc64892b7c",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
       "position": [
-        -672,
-        320
+        -736,
+        368
       ],
       "credentials": {
         "openAiApi": {
-          "id": "GKuXYAPp9ZSLjC5J",
+          "id": "KH2AsYmiOxLOA0CT",
           "name": "OpenAi account"
         }
       }
@@ -39,13 +39,13 @@
           }
         }
       },
-      "id": "07cd95d1-5eef-49ff-aba9-b7b418b55599",
+      "id": "1fa4af6e-5ab8-4b2f-a1f4-669c1a0221f8",
       "name": "Default Data Loader",
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1,
       "position": [
-        1072,
-        1056
+        1008,
+        1104
       ]
     },
     {
@@ -53,17 +53,17 @@
         "model": "text-embedding-3-small",
         "options": {}
       },
-      "id": "985904de-b3d1-4ecb-a7e4-9cdd931e3bd0",
+      "id": "93eb62a0-d504-4f04-89a6-73faa87dc48c",
       "name": "Embeddings OpenAI1",
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1,
       "position": [
-        864,
-        1056
+        800,
+        1104
       ],
       "credentials": {
         "openAiApi": {
-          "id": "GKuXYAPp9ZSLjC5J",
+          "id": "KH2AsYmiOxLOA0CT",
           "name": "OpenAi account"
         }
       }
@@ -75,13 +75,13 @@
         "width": 583.4552380860637,
         "color": 4
       },
-      "id": "4e0c8b1f-f317-40ed-9c1f-0cdaddbc8720",
+      "id": "a69ebd65-da4d-4469-97e0-da867af64fbf",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        64,
-        -48
+        0,
+        0
       ]
     },
     {
@@ -91,13 +91,13 @@
         "width": 3073,
         "color": 5
       },
-      "id": "91fbc037-766d-4e2e-8472-34cdba4acd1f",
+      "id": "790dec5d-27f8-4748-8b0b-cbd9885a14d6",
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1680,
-        496
+        -1744,
+        544
       ]
     },
     {
@@ -116,18 +116,18 @@
           }
         }
       },
-      "id": "2b368dda-aef4-4893-a29b-5b6686e26436",
+      "id": "de7d07d5-b0f2-4365-8fd3-49ae0ce3864b",
       "name": "Download File",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        -592,
-        784
+        -656,
+        832
       ],
       "executeOnce": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "YQIo50yTn6Ypl5wQ",
+          "id": "4ShjlRGbEP7qFwO6",
           "name": "Google Drive account"
         }
       }
@@ -152,17 +152,17 @@
         "event": "fileCreated",
         "options": {}
       },
-      "id": "e5de267a-35b2-4e04-a7cf-131a997b4e16",
+      "id": "bd0fb1ef-50fc-4a96-b969-3182dd994084",
       "name": "File Created",
       "type": "n8n-nodes-base.googleDriveTrigger",
       "typeVersion": 1,
       "position": [
-        -1616,
-        624
+        -1680,
+        672
       ],
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "YQIo50yTn6Ypl5wQ",
+          "id": "4ShjlRGbEP7qFwO6",
           "name": "Google Drive account"
         }
       }
@@ -187,17 +187,17 @@
         "event": "fileUpdated",
         "options": {}
       },
-      "id": "336649d4-2bea-4dd7-a589-2e07eab3228b",
+      "id": "d130d154-c24f-4363-a745-631781b70fa4",
       "name": "File Updated",
       "type": "n8n-nodes-base.googleDriveTrigger",
       "typeVersion": 1,
       "position": [
-        -1616,
-        784
+        -1680,
+        832
       ],
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "YQIo50yTn6Ypl5wQ",
+          "id": "4ShjlRGbEP7qFwO6",
           "name": "Google Drive account"
         }
       }
@@ -207,30 +207,30 @@
         "operation": "text",
         "options": {}
       },
-      "id": "0e29f122-6141-4f67-87b4-bef06c2ea32b",
+      "id": "5bd899d7-08a0-4c03-9ad9-28d17ace7f91",
       "name": "Extract Document Text",
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        112,
-        1200
+        48,
+        1248
       ],
       "alwaysOutputData": true
     },
     {
       "parameters": {},
-      "id": "2499dcda-36d5-45dd-9c31-2dd423f04ab4",
+      "id": "94558c7f-f346-4b72-a8cd-e9389fb135f2",
       "name": "Postgres Chat Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1,
       "position": [
-        -544,
-        320
+        -608,
+        368
       ],
       "notesInFlow": false,
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -267,13 +267,13 @@
         },
         "options": {}
       },
-      "id": "01835980-b158-4a94-9404-29e0ec945257",
+      "id": "5bb2baed-5aee-4f8b-b1fa-0a616f05b1b2",
       "name": "Set File ID",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1264,
-        784
+        -1328,
+        832
       ]
     },
     {
@@ -282,26 +282,26 @@
         "height": 464.8027193303974,
         "width": 1035.6381264595484
       },
-      "id": "bb55a8c7-1b53-4659-a5c8-d46846c4a5e0",
+      "id": "0e6943dc-6f82-4c70-9d64-50e828cbd348",
       "name": "Sticky Note2",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -976,
-        16
+        -1040,
+        64
       ]
     },
     {
       "parameters": {
         "options": {}
       },
-      "id": "3784ce14-69fa-458b-bb57-176b65c5da58",
+      "id": "8bc2f053-5b26-4de3-ae49-126f501f5baa",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        -112,
-        96
+        -176,
+        144
       ]
     },
     {
@@ -324,27 +324,28 @@
         },
         "options": {}
       },
-      "id": "e7dc42d0-f5db-4dd1-b5d2-d7438bd00623",
+      "id": "546cdbe0-b692-4031-b49b-d1979fad5196",
       "name": "Edit Fields",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -672,
-        96
+        -736,
+        144
       ]
     },
     {
       "parameters": {
         "public": true,
+        "initialMessages": "Hi there! 👋\nHi Im josh's Assistant. How can i help you.",
         "options": {}
       },
-      "id": "70d97755-d860-422f-87cf-05027c888341",
+      "id": "f3ed6dd7-42bb-499a-8412-65d5ea1da413",
       "name": "When chat message received",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
       "position": [
-        -944,
-        96
+        -1008,
+        144
       ],
       "webhookId": "e104e40e-6134-4825-a6f0-8a646d882662"
     },
@@ -355,13 +356,13 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "21d6453a-31ba-4273-a105-9842259c21b1",
+      "id": "c0b648d2-8085-4a65-9ccc-ac81bcb343ed",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -944,
-        304
+        -1008,
+        352
       ],
       "webhookId": "bf4dd093-bb02-472c-9454-7ab9af97bd1d"
     },
@@ -370,13 +371,13 @@
         "operation": "pdf",
         "options": {}
       },
-      "id": "3a402ced-8036-4efd-b634-abeb46d3fbef",
+      "id": "71d83647-3b40-404c-a655-aadf3ca590ae",
       "name": "Extract PDF Text",
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        112,
-        1024
+        48,
+        1072
       ]
     },
     {
@@ -384,13 +385,13 @@
         "aggregate": "aggregateAllItemData",
         "options": {}
       },
-      "id": "d0b02d0a-0d61-45d5-a887-d039d313456f",
+      "id": "45e99349-f69c-47b9-938c-c2492230eaee",
       "name": "Aggregate",
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        320,
-        592
+        256,
+        640
       ]
     },
     {
@@ -405,13 +406,13 @@
         },
         "options": {}
       },
-      "id": "bddedc2c-f478-4f75-9a5a-4d6c7bd7adc2",
+      "id": "b552913f-69bc-4d0e-ab9a-83ab33580646",
       "name": "Summarize",
       "type": "n8n-nodes-base.summarize",
       "typeVersion": 1,
       "position": [
-        528,
-        672
+        464,
+        720
       ]
     },
     {
@@ -422,13 +423,13 @@
           "systemMessage": "You are a personal assistant who helps answer questions from a corpus of documents. The documents are either text based (Txt, docs, extracted PDFs, etc.) or tabular data (CSVs or Excel documents).\n\nYou are given tools to perform RAG in the 'documents' table, look up the documents available in your knowledge base in the 'document_metadata' table, extract all the text from a given document, and query the tabular files with SQL in the 'document_rows' table.\n\nAlways start by performing RAG unless the question requires a SQL query for tabular data (fetching a sum, finding a max, something a RAG lookup would be unreliable for). If RAG doesn't help, then look at the documents that are available to you, find a few that you think would contain the answer, and then analyze those.\n\nAlways tell the user if you didn't find the answer. Don't make something up just to please them."
         }
       },
-      "id": "2a4b8ec6-d1a8-4a0c-90eb-8c025d1ccefe",
+      "id": "516b4ec9-728e-4a9c-8b46-298d9bdb28ba",
       "name": "RAG AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.6,
       "position": [
-        -464,
-        96
+        -528,
+        144
       ]
     },
     {
@@ -532,13 +533,13 @@
           "fallbackOutput": "extra"
         }
       },
-      "id": "e07890d4-00a9-4d1a-a7e8-fb1f610149c0",
+      "id": "093f660c-ad92-4951-98c8-8cc3cf8becea",
       "name": "Switch",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
       "position": [
-        -400,
-        752
+        -464,
+        800
       ]
     },
     {
@@ -546,13 +547,13 @@
         "operation": "xlsx",
         "options": {}
       },
-      "id": "27eab1e3-479a-4179-8dbd-590ef10cf058",
+      "id": "fd01bfe3-5425-45b0-846d-b9deb0790cd4",
       "name": "Extract from Excel",
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        112,
-        592
+        48,
+        640
       ]
     },
     {
@@ -578,10 +579,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        944,
-        608
+        880,
+        656
       ],
-      "id": "b99ecb58-22dc-4500-a4f9-66aa26a49c08",
+      "id": "3e07ad4f-54dc-4322-9f5c-d90aaa0f9023",
       "name": "Set Schema"
     },
     {
@@ -591,10 +592,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        112,
-        768
+        48,
+        816
       ],
-      "id": "a07ec36c-363e-42c7-b023-0526b4271b6c",
+      "id": "04465996-8c14-4620-8b83-9f84411160a6",
       "name": "Extract from CSV"
     },
     {
@@ -606,11 +607,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1680,
-        176
+        -1744,
+        224
       ],
       "typeVersion": 1,
-      "id": "2f7a2ddb-a9a7-4a65-9aa4-495e8887763a",
+      "id": "02eb62e0-596d-438c-816a-6a5e5cbeb517",
       "name": "Sticky Note3"
     },
     {
@@ -622,14 +623,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        -1568,
-        272
+        -1632,
+        320
       ],
-      "id": "58be2de1-9b84-4c0e-8bde-58ce559c0192",
+      "id": "618eaf40-cc6b-4ae1-8eff-92b3c41f5125",
       "name": "Create Document Metadata Table",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -643,14 +644,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        -1264,
-        272
+        -1328,
+        320
       ],
-      "id": "1f3d8da4-654e-4b56-bb6e-078cfff08c33",
+      "id": "05a3a4d0-a70b-494c-a465-44dbbbd09a77",
       "name": "Create Document Rows Table (for Tabular Data)",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -677,14 +678,14 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.5,
       "position": [
-        -400,
-        320
+        -464,
+        368
       ],
-      "id": "853c9e1e-6a0d-44aa-b905-1f07de554095",
+      "id": "bd7e35ce-430b-4e42-a4bf-e4e93d2d111a",
       "name": "List Documents",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -702,14 +703,14 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.5,
       "position": [
-        -256,
-        320
+        -320,
+        368
       ],
-      "id": "a7291437-6487-48de-a26b-e3868adea6e6",
+      "id": "a4344f38-78b1-411a-957d-b91b69bf5fdd",
       "name": "Get File Contents",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -725,14 +726,14 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.5,
       "position": [
-        -96,
-        320
+        -160,
+        368
       ],
-      "id": "4889c7dd-41cf-4f4b-a44f-10587a914ef1",
+      "id": "165a3025-30c6-4e8b-9fb8-5cea36402de9",
       "name": "Query Document Rows",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -744,14 +745,14 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1.2,
       "position": [
-        192,
-        304
+        128,
+        352
       ],
-      "id": "bfdfe804-7a29-47f2-9a2a-831de60563fb",
+      "id": "702b7605-9692-40f9-baab-b823ed53d212",
       "name": "Embeddings OpenAI2",
       "credentials": {
         "openAiApi": {
-          "id": "GKuXYAPp9ZSLjC5J",
+          "id": "KH2AsYmiOxLOA0CT",
           "name": "OpenAi account"
         }
       }
@@ -765,10 +766,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -1440,
-        624
+        -1504,
+        672
       ],
-      "id": "135a6329-19ff-4242-85af-f4affd81a83a",
+      "id": "f56d3749-c229-4fed-85a8-01efff2d8341",
       "name": "Loop Over Items"
     },
     {
@@ -853,15 +854,15 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        -752,
-        640
+        -816,
+        688
       ],
-      "id": "0f3ac107-3355-44af-97bc-e178d1d80e6f",
+      "id": "41ac3b38-7b5e-42e6-826f-62b10cc22bed",
       "name": "Insert Document Metadata",
       "executeOnce": true,
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -926,14 +927,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        320,
-        768
+        256,
+        816
       ],
-      "id": "6ad1de18-d75b-47ab-b74f-270844fe3b43",
+      "id": "ce3a932d-abf3-4c78-9780-a1b5fd0e4fe2",
       "name": "Insert Table Rows",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1020,14 +1021,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        1168,
-        608
+        1104,
+        656
       ],
-      "id": "983a1e10-2868-4ac0-a61e-475651209b4c",
+      "id": "2a57133d-76cf-4c7a-8ebd-69485c963eb2",
       "name": "Update Schema for Document Metadata",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1041,11 +1042,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -2256,
-        176
+        -2320,
+        224
       ],
       "typeVersion": 1,
-      "id": "8fbb62fd-917b-441d-8bcb-5c9905ae5785",
+      "id": "d4ea3101-6cac-44eb-99a6-a3bbc75d1ec0",
       "name": "Sticky Note9"
     },
     {
@@ -1055,14 +1056,14 @@
       "type": "@n8n/n8n-nodes-langchain.rerankerCohere",
       "typeVersion": 1,
       "position": [
-        384,
-        304
+        320,
+        352
       ],
-      "id": "5a69f9c8-378c-49ff-b8f7-63ca653a2e3b",
+      "id": "ddf5c924-8f88-4851-942a-a4fa15b4cd4f",
       "name": "Reranker Cohere",
       "credentials": {
         "cohereApi": {
-          "id": "aIUails8qg0WS4J5",
+          "id": "7RJH8HyFwFLrBmWV",
           "name": "CohereApi account"
         }
       }
@@ -1079,14 +1080,14 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
       "typeVersion": 1.3,
       "position": [
-        256,
-        96
+        192,
+        144
       ],
-      "id": "7d9c2002-ead4-4358-9629-48fbc7dca9c1",
+      "id": "3c46f64f-8b79-465a-ab22-faed759c55d0",
       "name": "Postgres PGVector Store",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1100,14 +1101,14 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
       "typeVersion": 1.3,
       "position": [
-        944,
-        800
+        880,
+        848
       ],
-      "id": "eee72df3-9611-4e59-965d-3ab4419d048c",
+      "id": "182e8f3d-cef6-4226-aec4-2191f37fc065",
       "name": "Postgres PGVector Store1",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1123,14 +1124,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -1088,
-        640
+        -1152,
+        688
       ],
-      "id": "01161693-e3ba-4743-b29b-4d360905993a",
+      "id": "ded2f991-09f2-42c1-aecd-4a981640b0a1",
       "name": "Delete Old Data Rows",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1146,14 +1147,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -912,
-        800
+        -976,
+        848
       ],
-      "id": "537b0bce-05bf-4e6f-a8b0-2db38c87f92c",
+      "id": "fb42c82d-1262-4a76-a3db-2647b014b037",
       "name": "Delete Old Doc Rows",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1182,17 +1183,17 @@
         },
         "options": {}
       },
-      "id": "0523e506-bcaf-43de-a60f-136df30b3dd5",
+      "id": "aaa10d70-9978-4eb1-b900-eb0964f52f1c",
       "name": "Get Trashed Files via API",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        -1376,
-        1504
+        -1440,
+        1552
       ],
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "YQIo50yTn6Ypl5wQ",
+          "id": "4ShjlRGbEP7qFwO6",
           "name": "Google Drive account"
         }
       }
@@ -1201,13 +1202,13 @@
       "parameters": {
         "jsCode": "// Parse the response from Google Drive API\nconst response = $input.first().json;\nconst trashedFiles = response.files || [];\n\nif (trashedFiles.length === 0) {\n  return [{ message: 'No trashed files found', count: 0 }];\n}\n\n// Return each file as a separate item for processing\nreturn trashedFiles.map(file => ({\n  file_id: file.id,\n  file_name: file.name,\n  file_type: file.mimeType,\n  file_url: file.webViewLink,\n  trashed_time: file.trashedTime\n}));"
       },
-      "id": "9151af71-eb8b-4a8c-97ad-f83545e3230a",
+      "id": "e120f3ad-771e-43a4-ab08-5a96ac8318db",
       "name": "Parse Trashed Files",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1184,
-        1504
+        -1248,
+        1552
       ]
     },
     {
@@ -1224,13 +1225,13 @@
         },
         "options": {}
       },
-      "id": "070b5926-4a13-4154-9065-7afe6ac542e0",
+      "id": "5f2f4429-f77b-49f0-97e5-debdd5d010af",
       "name": "Has Files to Delete?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -976,
-        1504
+        -1040,
+        1552
       ]
     },
     {
@@ -1239,17 +1240,17 @@
         "query": "SELECT id FROM document_metadata WHERE id = '{{ $json.file_id }}'",
         "options": {}
       },
-      "id": "2b86eea2-387a-4350-af82-06006098e3e4",
+      "id": "63518e30-a784-4212-b604-f1ca174a7211",
       "name": "Check If Exists in DB",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        -784,
-        1504
+        -848,
+        1552
       ],
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       },
@@ -1280,13 +1281,13 @@
         },
         "options": {}
       },
-      "id": "c271fc40-05f7-4fc9-a534-b0c4b01e0b2b",
+      "id": "a1848908-9dc6-4144-8367-4aa7e06dfdba",
       "name": "Exists in DB?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -576,
-        1504
+        -640,
+        1552
       ]
     },
     {
@@ -1296,13 +1297,13 @@
         "width": 1976,
         "color": 6
       },
-      "id": "f753fbc1-c424-4608-8660-463202cef392",
+      "id": "3a84a90b-da27-4a1f-8d79-4c8c06a344ed",
       "name": "Sticky Note8",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1680,
-        1392
+        -1744,
+        1440
       ]
     },
     {
@@ -1311,17 +1312,17 @@
         "query": "DELETE FROM document_metadata WHERE id = '{{ $('Parse Trashed Files').first().json.file_id }}'",
         "options": {}
       },
-      "id": "70adceff-ba64-42a2-b65c-de91ce042784",
+      "id": "85c00331-a1fd-45e1-80cb-c97462ed72c4",
       "name": "Delete Metadata",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        32,
-        1504
+        -32,
+        1552
       ],
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1337,13 +1338,13 @@
           ]
         }
       },
-      "id": "76cf30ab-f5df-41de-8943-b919a5c9534e",
+      "id": "b41d0240-57f0-4157-b05f-8170b8718eeb",
       "name": "Check Every 15 Minutes",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
       "position": [
-        -1584,
-        1504
+        -1648,
+        1552
       ]
     },
     {
@@ -1357,14 +1358,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -352,
-        1504
+        -416,
+        1552
       ],
-      "id": "65c67cb2-44ce-468b-927a-84d60017b65a",
+      "id": "ddd701a6-2576-451f-b6e0-ffb558747b2e",
       "name": "Delete Old Data Rows1",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1380,14 +1381,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -160,
-        1504
+        -224,
+        1552
       ],
-      "id": "b6415e3c-dba6-4ee3-aaec-759b02b3782f",
+      "id": "02382e11-ddb3-43fb-9768-9c5514d1f0a1",
       "name": "Delete Old Doc Rows1",
       "credentials": {
         "postgres": {
-          "id": "g39aojDCGwtGAJKg",
+          "id": "h5I2QAd9TJFmWAT8",
           "name": "Postgres account"
         }
       }
@@ -1399,10 +1400,10 @@
       "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
       "typeVersion": 1,
       "position": [
-        1152,
-        1200
+        1088,
+        1248
       ],
-      "id": "2dd6a1c2-37d5-4216-9cc9-68810a9ad1f3",
+      "id": "1bd2f544-a2f5-425b-92f4-4a6662627bbc",
       "name": "Recursive Character Text Splitter"
     },
     {
@@ -1436,10 +1437,10 @@
       "type": "@n8n/n8n-nodes-langchain.code",
       "typeVersion": 1,
       "position": [
-        384,
-        1024
+        320,
+        1072
       ],
-      "id": "6bb312f2-1662-4455-89ba-28438db9fdf7",
+      "id": "e05cefa9-2423-4fd4-98c3-002c18a4be78",
       "name": "LangChain Code"
     },
     {
@@ -1455,14 +1456,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        464,
-        1216
+        400,
+        1264
       ],
-      "id": "24453240-efa5-41dc-9802-f624f63ef786",
+      "id": "46d58c45-f859-440c-92fd-ca6983672246",
       "name": "OpenAI Chat Model1",
       "credentials": {
         "openAiApi": {
-          "id": "GKuXYAPp9ZSLjC5J",
+          "id": "KH2AsYmiOxLOA0CT",
           "name": "OpenAi account"
         }
       }
