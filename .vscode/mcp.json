@@ -1,9 +1,21 @@
 {
-	"servers": {
-		"github": {
-			"url": "https://api.githubcopilot.com/mcp/",
-			"type": "http"
-		}
-	},
-	"inputs": []
+    "servers": {
+        "n8n-mcp": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "--init",
+                "-e", "MCP_MODE=stdio",
+                "-e", "LOG_LEVEL=error",
+                "-e", "DISABLE_CONSOLE_OUTPUT=true",
+                "-e", "N8N_API_URL=https://automation.joshyorko.com",
+                "-e", "N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmOTg4MzE3MS1kZTgzLTQxMDktYjZhZi1mZjg4M2E0YTE0YmUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY2Nzk0NzQ0LCJleHAiOjE3NjkzODIwMDB9.OQ5v3WQN2o9bcu3QTmHEWkpouS3VKePyjz-nRHY3Yl8",
+                "ghcr.io/czlonkowski/n8n-mcp:latest"
+            ]
+        }
+    }
 }
+
+
