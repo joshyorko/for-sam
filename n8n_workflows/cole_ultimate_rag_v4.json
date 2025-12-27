@@ -144,10 +144,10 @@
         "triggerOn": "specificFolder",
         "folderToWatch": {
           "__rl": true,
-          "value": "1yfaYWtBKooyiiJbM3hQRda1v6aK0akdo",
+          "value": "1RfMaFAu_TPIroMoC-jWLHKS9gnWdAYE9",
           "mode": "list",
-          "cachedResultName": "Neon n8n",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1yfaYWtBKooyiiJbM3hQRda1v6aK0akdo"
+          "cachedResultName": "RFPS_SAM",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1RfMaFAu_TPIroMoC-jWLHKS9gnWdAYE9"
         },
         "event": "fileCreated",
         "options": {}
@@ -179,10 +179,10 @@
         "triggerOn": "specificFolder",
         "folderToWatch": {
           "__rl": true,
-          "value": "1yfaYWtBKooyiiJbM3hQRda1v6aK0akdo",
+          "value": "1RfMaFAu_TPIroMoC-jWLHKS9gnWdAYE9",
           "mode": "list",
-          "cachedResultName": "Neon n8n",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1yfaYWtBKooyiiJbM3hQRda1v6aK0akdo"
+          "cachedResultName": "RFPS_SAM",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1RfMaFAu_TPIroMoC-jWLHKS9gnWdAYE9"
         },
         "event": "fileUpdated",
         "options": {}
