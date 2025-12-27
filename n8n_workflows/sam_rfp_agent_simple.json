@@ -7,35 +7,13 @@
         "width": 500,
         "color": 6
       },
-      "id": "6d9ad91b-93df-4aea-8b11-f45ff2718f0e",
+      "id": "932b37de-e0a2-42fb-bea6-773e3781ff88",
       "name": "README",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1904,
-        2160
-      ]
-    },
-    {
-      "parameters": {
-        "options": {
-          "metadata": {
-            "metadataValues": [
-              {
-                "name": "source",
-                "value": "={{ $('List Files in Drive').item.json.name }}"
-              }
-            ]
-          }
-        }
-      },
-      "id": "470b7f53-88dc-4298-87f6-7eebaff78c0a",
-      "name": "Default Data Loader",
-      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
-      "typeVersion": 1.1,
-      "position": [
-        3344,
-        3312
+        5344,
+        3808
       ]
     },
     {
@@ -47,26 +25,26 @@
           "value": "vector_store_key"
         }
       },
-      "id": "07ee3e4e-27f4-4912-94c1-9466b894fd0c",
+      "id": "a7c1d7b2-3d9e-4321-9cab-e11709483601",
       "name": "In-Memory Vector Store (Ingest)",
       "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
       "typeVersion": 1.3,
       "position": [
-        3136,
-        3088
+        4624,
+        4864
       ]
     },
     {
       "parameters": {
         "options": {}
       },
-      "id": "ea2443bb-19d2-4443-a77f-730a2ed4face",
+      "id": "21c50559-a040-46a4-9625-53b79675dabf",
       "name": "Embeddings OpenAI",
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1.2,
       "position": [
-        3040,
-        3360
+        4672,
+        5312
       ],
       "credentials": {
         "openAiApi": {
@@ -80,13 +58,13 @@
         "public": true,
         "options": {}
       },
-      "id": "619c1969-4b5b-4cc9-a9c9-511ff89d2117",
+      "id": "074182d5-d464-42db-8b62-493995424e1f",
       "name": "Chat Entrypoint",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        1904,
-        2912
+        5344,
+        4560
       ],
       "webhookId": "477555ef-512c-4e7b-963b-329da5f8051e"
     },
@@ -96,13 +74,13 @@
           "systemMessage": "You are Sam's RFP Assistant. Your job is to find exact answers from the documents Sam has uploaded.\n\n1. Always search the documents first using the vector store tool.\n2. Return the exact question and answer if you find a match.\n3. Be concise and helpful.\n4. Mention which document you found the answer in."
         }
       },
-      "id": "dfa29719-10d4-40e6-9086-e41b8152ea28",
+      "id": "344e7c40-bc48-41b9-8682-b64ee6891170",
       "name": "AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2128,
-        2912
+        5568,
+        4560
       ]
     },
     {
@@ -116,13 +94,13 @@
         "builtInTools": {},
         "options": {}
       },
-      "id": "2013c248-245b-4d0f-a9ff-b867a23d5d14",
+      "id": "1e631c4a-d3e1-4a21-af1d-bce059c7c3d1",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        2128,
-        3120
+        5568,
+        4768
       ],
       "credentials": {
         "openAiApi": {
@@ -133,26 +111,26 @@
     },
     {
       "parameters": {},
-      "id": "6a0ef9d9-29ea-4c41-b4e2-7b58d0f693ed",
+      "id": "73c7dc96-ca32-472c-b401-cb04d66fb43c",
       "name": "Window Buffer Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        2272,
-        3120
+        5696,
+        4800
       ]
     },
     {
       "parameters": {
         "description": "Sam's RFP documents"
       },
-      "id": "8e07451e-5e10-4006-bd16-e425d2721f60",
+      "id": "a3aec283-cb4b-4fec-a5c6-7a41b54afb8b",
       "name": "Vector Store Tool",
       "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
       "typeVersion": 1.1,
       "position": [
-        2704,
-        2960
+        5984,
+        4592
       ]
     },
     {
@@ -163,13 +141,13 @@
           "value": "vector_store_key"
         }
       },
-      "id": "a41ce01b-961c-4826-90f3-d22047bfc70d",
+      "id": "3c6523d2-3329-45f8-a00e-59cd644914ff",
       "name": "In-Memory Vector Store (Retrieve)",
       "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
       "typeVersion": 1.3,
       "position": [
-        2224,
-        3392
+        5664,
+        5040
       ]
     },
     {
@@ -186,10 +164,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        2656,
-        3296
+        6096,
+        4944
       ],
-      "id": "fd30a6c0-9d6c-4092-a21a-30bebf5603b5",
+      "id": "bd99c36d-089c-41fa-a09d-e4fd96943de0",
       "name": "OpenAI Chat Model1",
       "credentials": {
         "openAiApi": {
@@ -207,10 +185,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1936,
-        2656
+        5056,
+        4448
       ],
-      "id": "9f590a68-e0bb-4a53-b066-763a54e96539",
+      "id": "ae2be244-79c0-43d1-872a-b0fed8a43d30",
       "name": "Loop Over Items"
     },
     {
@@ -233,13 +211,13 @@
         "event": "fileCreated",
         "options": {}
       },
-      "id": "4602f6ee-7956-42d6-b86e-56048ddc8809",
+      "id": "c81ea9f3-6054-4f94-8e49-1329d5dbd6de",
       "name": "File Created",
       "type": "n8n-nodes-base.googleDriveTrigger",
       "typeVersion": 1,
       "position": [
-        1616,
-        2528
+        5056,
+        4176
       ],
       "credentials": {
         "googleDriveOAuth2Api": {
@@ -280,13 +258,13 @@
         },
         "options": {}
       },
-      "id": "980cc7a9-dece-45bf-b2d4-63ee9ffd3149",
+      "id": "2540173b-4074-4d71-b9b1-4422f8a70a25",
       "name": "Set File ID",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2160,
-        2672
+        5600,
+        4320
       ]
     },
     {
@@ -305,13 +283,13 @@
           }
         }
       },
-      "id": "32a502be-e859-460f-88e2-823e693505fe",
+      "id": "e9c79d43-40bc-442b-b260-2b685957eb76",
       "name": "Download File",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        2496,
-        2272
+        5936,
+        3920
       ],
       "executeOnce": true,
       "credentials": {
@@ -326,13 +304,13 @@
         "operation": "text",
         "options": {}
       },
-      "id": "e226f4ea-49bf-4524-9b21-ebed886bc341",
+      "id": "4b0c8f18-d75e-4f1c-b10b-a282458b43d3",
       "name": "Extract Document Text",
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        4128,
-        2736
+        7568,
+        4384
       ],
       "alwaysOutputData": true
     },
@@ -341,13 +319,13 @@
         "operation": "pdf",
         "options": {}
       },
-      "id": "344db7ff-d891-4db1-a5c4-b2364f2f75dc",
+      "id": "ad2020d4-d6e9-4266-9ce6-81f45e63ba66",
       "name": "Extract PDF Text",
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        4128,
-        2560
+        7568,
+        4208
       ]
     },
     {
@@ -451,13 +429,13 @@
           "fallbackOutput": "extra"
         }
       },
-      "id": "44740a7b-4c16-4798-bb16-7663b5438d18",
+      "id": "988d1c9a-acb0-44db-a4f0-8e6520344b7b",
       "name": "Switch",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
       "position": [
-        3616,
-        2288
+        7056,
+        3936
       ]
     },
     {
@@ -467,23 +445,30 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        4128,
-        2304
+        7568,
+        3952
       ],
-      "id": "e358a6d4-4882-47b0-a7af-dd69b5d85396",
+      "id": "f348ed50-d28c-44ef-9ce9-d68fa59a71c1",
       "name": "Extract from CSV"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        4768,
+        5072
+      ],
+      "id": "79fd8a45-0642-4558-8205-a74f96ef6a13",
+      "name": "Default Data Loader"
     }
   ],
   "connections": {
-    "Default Data Loader": {
-      "ai_document": [
-        [
-          {
-            "node": "In-Memory Vector Store (Ingest)",
-            "type": "ai_document",
-            "index": 0
-          }
-        ]
+    "In-Memory Vector Store (Ingest)": {
+      "main": [
+        []
       ]
     },
     "Embeddings OpenAI": {
@@ -613,6 +598,17 @@
         ]
       ]
     },
+    "Extract PDF Text": {
+      "main": [
+        [
+          {
+            "node": "In-Memory Vector Store (Ingest)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Switch": {
       "main": [
         [],
@@ -646,52 +642,40 @@
         ]
       ]
     },
-    "Extract from CSV": {
-      "main": [
+    "Default Data Loader": {
+      "ai_document": [
         [
           {
-            "node": "Default Data Loader",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract PDF Text": {
-      "main": [
-        [
-          {
-            "node": "Default Data Loader",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract Document Text": {
-      "main": [
-        [
-          {
-            "node": "Default Data Loader",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "In-Memory Vector Store (Ingest)": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
+            "node": "In-Memory Vector Store (Ingest)",
+            "type": "ai_document",
             "index": 0
           }
         ]
       ]
     }
   },
-  "pinData": {},
+  "pinData": {
+    "Extract PDF Text": [
+      {
+        "numpages": 9,
+        "numrender": 9,
+        "info": {
+          "PDFFormatVersion": "1.4",
+          "Language": "en",
+          "EncryptFilterName": null,
+          "IsLinearized": false,
+          "IsAcroFormPresent": false,
+          "IsXFAPresent": false,
+          "IsCollectionPresent": false,
+          "IsSignaturesPresent": false,
+          "Title": "test-rfp",
+          "Producer": "Skia/PDF m145 Google Docs Renderer"
+        },
+        "text": "Got it. Here’s a clean, realistic example RFP you can drop straight into Google Drive as a doc\nor PDF and use to exercise your flow. This is intentionally boring-correct enterprise style —\nexactly the kind of thing automation + LLM workflows should chew through without drama.\nRequest for Proposal (RFP)\nAutomation & Workflow Orchestration Platform\nRFP ID: RFP-2025-ACME-AUTO-001\nIssue Date: December 20, 2025\nResponse Due: January 10, 2026\nIssuing Organization: Acme Health Services, Inc.\n1. Introduction\nAcme Health Services, Inc. (“Acme”) is seeking proposals from qualified vendors to provide an\nAutomation and Workflow Orchestration Platform to support internal business processes,\ndata operations, and system integrations.\nThe selected solution must be secure, scalable, auditable, and suitable for deployment in a\nhybrid or self-hosted environment.\n2. Organizational Background\nAcme Health Services is a mid-sized healthcare services provider operating across multiple\nU.S. states. Acme manages claims processing, provider onboarding, compliance reporting, and\ninternal IT operations that require reliable automation and orchestration capabilities.\n3. Project Objectives\nThe primary objectives of this project are:\n\n● Reduce manual, repetitive operational work\n● Improve reliability and observability of automated workflows\n● Enable reusable, version-controlled automation\n● Support future AI-augmented workflows\n● Maintain compliance with healthcare security standards\n4. Scope of Work\nThe vendor solution must support the following capabilities:\n4.1 Automation Execution\n● Scripted and declarative automation support\n● Ability to execute Python-based workflows\n● Support for CLI-based or API-driven execution\n4.2 Orchestration\n● Workflow scheduling and triggering\n● Dependency management between tasks\n● Support for event-driven workflows\n4.3 Deployment Model\n● Self-hosted or on-prem deployment\n● Kubernetes-native or container-friendly architecture\n● No mandatory SaaS lock-in\n4.4 Security & Compliance\n● Role-based access control (RBAC)\n● Audit logging\n● Secure secrets management\n● HIPAA-aligned security posture preferred\n4.5 Observability\n● Execution logs per workflow run\n● Failure reporting and retry logic\n● Metrics and basic monitoring hooks\n\n5. Technical Requirements\nVendors should address the following technical requirements:\n● Linux-compatible runtime\n● API-first architecture\n● Support for Git-based workflow definitions\n● Ability to run in air-gapped or restricted network environments\n● Minimal external dependencies\n6. Vendor Qualifications\nProposals should include:\n● Company background and years in operation\n● Relevant customer references\n● Experience with automation platforms or workflow engines\n● Open-source involvement (if applicable)\n7. Proposal Submission Requirements\nProposals must include:\n1. Executive summary\n2. Technical approach and architecture overview\n3. Deployment model description\n4. Security considerations\n5. Pricing model\n6. Implementation timeline\n7. Support and maintenance details\nSubmissions should be provided in PDF format.\n8. Evaluation Criteria\nProposals will be evaluated based on:\n\n● Technical fit (40%)\n● Security and compliance (25%)\n● Cost (20%)\n● Vendor experience (10%)\n● Implementation timeline (5%)\n9. Timeline\nMilestone Date\nRFP Issued December 20,\n2025\nQuestions Due December 30,\n2025\nProposal Due January 10, 2026\nVendor Selection January 20, 2026\nProject Start February 2026\n10. Contact Information\nAll communications regarding this RFP should be directed to:\nProcurement Office\nAcme Health Services, Inc.\nEmail: procurement@acmehealth.example\n11. Confidentiality\nAll information provided in response to this RFP will be treated as confidential and used solely\nfor evaluation purposes.\nWhy this is a good test artifact\n\n● Multiple structured sections\n● Realistic enterprise language\n● Clear entities, dates, requirements, and constraints\n● Easy to extract: scope, requirements, timelines, contacts\n● Perfect for testing:\n○ Doc ingestion\n○ Chunking\n○ Requirement extraction\n○ Summary generation\n○ Vendor fit analysis\nIf you want, next we can:\n● Add intentional ambiguity (to test reasoning)\n● Create a bad RFP (realistic garbage input)\n● Generate 3 fake vendor responses to test comparison\n● Turn this into a multi-doc Drive folder test (RFP + addendum + Q&A)\nJust say the word.\nGot it. Here’s a clean, realistic example RFP you can drop straight into Google Drive as a doc\nor PDF and use to exercise your flow. This is intentionally boring-correct enterprise style —\nexactly the kind of thing automation + LLM workflows should chew through without drama.\nRequest for Proposal (RFP)\nAutomation & Workflow Orchestration Platform\nRFP ID: RFP-2025-ACME-AUTO-001\nIssue Date: December 20, 2025\nResponse Due: January 10, 2026\nIssuing Organization: Acme Health Services, Inc.\n1. Introduction\nAcme Health Services, Inc. (“Acme”) is seeking proposals from qualified vendors to provide an\nAutomation and Workflow Orchestration Platform to support internal business processes,\ndata operations, and system integrations.\n\nThe selected solution must be secure, scalable, auditable, and suitable for deployment in a\nhybrid or self-hosted environment.\n2. Organizational Background\nAcme Health Services is a mid-sized healthcare services provider operating across multiple\nU.S. states. Acme manages claims processing, provider onboarding, compliance reporting, and\ninternal IT operations that require reliable automation and orchestration capabilities.\n3. Project Objectives\nThe primary objectives of this project are:\n● Reduce manual, repetitive operational work\n● Improve reliability and observability of automated workflows\n● Enable reusable, version-controlled automation\n● Support future AI-augmented workflows\n● Maintain compliance with healthcare security standards\n4. Scope of Work\nThe vendor solution must support the following capabilities:\n4.1 Automation Execution\n● Scripted and declarative automation support\n● Ability to execute Python-based workflows\n● Support for CLI-based or API-driven execution\n4.2 Orchestration\n● Workflow scheduling and triggering\n● Dependency management between tasks\n● Support for event-driven workflows\n4.3 Deployment Model\n\n● Self-hosted or on-prem deployment\n● Kubernetes-native or container-friendly architecture\n● No mandatory SaaS lock-in\n4.4 Security & Compliance\n● Role-based access control (RBAC)\n● Audit logging\n● Secure secrets management\n● HIPAA-aligned security posture preferred\n4.5 Observability\n● Execution logs per workflow run\n● Failure reporting and retry logic\n● Metrics and basic monitoring hooks\n5. Technical Requirements\nVendors should address the following technical requirements:\n● Linux-compatible runtime\n● API-first architecture\n● Support for Git-based workflow definitions\n● Ability to run in air-gapped or restricted network environments\n● Minimal external dependencies\n6. Vendor Qualifications\nProposals should include:\n● Company background and years in operation\n● Relevant customer references\n● Experience with automation platforms or workflow engines\n● Open-source involvement (if applicable)\n7. Proposal Submission Requirements\n\nProposals must include:\n1. Executive summary\n2. Technical approach and architecture overview\n3. Deployment model description\n4. Security considerations\n5. Pricing model\n6. Implementation timeline\n7. Support and maintenance details\nSubmissions should be provided in PDF format.\n8. Evaluation Criteria\nProposals will be evaluated based on:\n● Technical fit (40%)\n● Security and compliance (25%)\n● Cost (20%)\n● Vendor experience (10%)\n● Implementation timeline (5%)\n9. Timeline\nMilestone Date\nRFP Issued December 20,\n2025\nQuestions Due December 30,\n2025\nProposal Due January 10, 2026\nVendor Selection January 20, 2026\nProject Start February 2026\n10. Contact Information\n\nAll communications regarding this RFP should be directed to:\nProcurement Office\nAcme Health Services, Inc.\nEmail: procurement@acmehealth.example\n11. Confidentiality\nAll information provided in response to this RFP will be treated as confidential and used solely\nfor evaluation purposes.\nWhy this is a good test artifact\n● Multiple structured sections\n● Realistic enterprise language\n● Clear entities, dates, requirements, and constraints\n● Easy to extract: scope, requirements, timelines, contacts\n● Perfect for testing:\n○ Doc ingestion\n○ Chunking\n○ Requirement extraction\n○ Summary generation\n○ Vendor fit analysis\nIf you want, next we can:\n● Add intentional ambiguity (to test reasoning)\n● Create a bad RFP (realistic garbage input)\n● Generate 3 fake vendor responses to test comparison\n● Turn this into a multi-doc Drive folder test (RFP + addendum + Q&A)\nJust say the word.",
+        "version": "5.3.31"
+      }
+    ]
+  },
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "4c0ca4d0c6d7184d737a05b946b4bf5027b5effd45ff3194f7e25142a62a5977"
